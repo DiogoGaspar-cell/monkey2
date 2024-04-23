@@ -36,7 +36,7 @@ func (l *Lexer) readRune() {
 
 	if err != nil {
 		log.Printf("Error: %v", err)
-		l.ch = 0
+		l.ch = -1
 		return
 	}
 
@@ -129,6 +129,9 @@ func (l *Lexer) NextToken() token.Token {
 	case 0:
 		tok.Literal = ""
 		tok.Type = token.EOF
+	case -1:
+		tok.Literal = ""
+		tok.Type = token.ERROR
 	default:
 		if isLetterOrSymbol(l.ch) {
 			tok.Filename, tok.Line, tok.Col = l.filename, l.line, l.position
@@ -177,14 +180,14 @@ func (l *Lexer) peekRune() rune {
 
 	if err != nil {
 		log.Printf("Error: %v", err)
-		return 0
+		return -1
 	}
 	
 	err = l.reader.UnreadRune()
 
 	if err != nil {
 		log.Printf("Error: %v", err)
-		return 0
+		return -1
 	}
 
 	return r

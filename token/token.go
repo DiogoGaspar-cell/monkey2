@@ -3,6 +3,7 @@ package token
 type TokenType string
 
 const (
+	ERROR   = "ERROR"
 	ILLEGAL = "ILLEGAL"
 	EOF     = "EOF"
 
@@ -43,6 +44,7 @@ const (
 	FALSE    = "FALSE"
 	IF       = "IF"
 	ELSE     = "ELSE"
+	FOR      = "FOR"
 	RETURN   = "RETURN"
 )
 
@@ -61,6 +63,7 @@ var keywords = map[string]TokenType{
 	"false":  FALSE,
 	"if":     IF,
 	"else":   ELSE,
+	"for":    FOR,
 	"return": RETURN,
 }
 
