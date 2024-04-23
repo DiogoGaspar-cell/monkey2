@@ -5,7 +5,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/DiogoGaspar-cell/monkey2/token"
+	"github.com/diogo-gaspar23/monkey2/token"
 )
 
 type Lexer struct {

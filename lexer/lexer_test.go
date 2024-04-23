@@ -3,7 +3,7 @@ package lexer
 import (
 	"testing"
 
-	"github.com/DiogoGaspar-cell/monkey2/token"
+	"github.com/diogo-gaspar23/monkey2/token"
 )
 
 func TestNextToken(t *testing.T) {
@@ -37,7 +37,7 @@ let 🤖 = 3.14;
 		{token.ASSIGN, "=", expectedFilename, 1, 9},
 		{token.INT, "5", expectedFilename, 1, 11},
 		{token.TERMINATOR, ";", expectedFilename, 1, 12},
-		
+
 		{token.LET, "let", expectedFilename, 2, 0},
 		{token.IDENTIFIER, "ten", expectedFilename, 2, 4},
 		{token.ASSIGN, "=", expectedFilename, 2, 8},
