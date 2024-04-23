@@ -53,15 +53,14 @@ func (l *Lexer) NextToken() token.Token {
 	case '=':
 		if l.peekRune() == '=' {
 			ch := l.ch
+			
+			tok.Filename, tok.Line, tok.Col = l.filename, l.line, l.position
+			
 			l.readRune()
+			
 			literal := string(ch) + string(l.ch)
-			tok = token.Token{
-				Type: token.EQ,
-				Literal: literal,
-				Filename: l.filename,
-				Line: l.line,
-				Col: l.position,
-			}
+			
+			tok.Type, tok.Literal = token.EQ, literal
 		} else {
 			tok = newToken(token.ASSIGN, l.ch, l.filename, l.line, l.position)
 		}
@@ -72,15 +71,14 @@ func (l *Lexer) NextToken() token.Token {
 	case '!':
 		if l.peekRune() == '=' {
 			ch := l.ch
+			
+			tok.Filename, tok.Line, tok.Col = l.filename, l.line, l.position
+			
 			l.readRune()
+			
 			literal := string(ch) + string(l.ch)
-			tok = token.Token{
-				Type: token.NOT_EQ,
-				Literal: literal,
-				Filename: l.filename,
-				Line: l.line,
-				Col: l.position,
-			}
+			
+			tok.Type, tok.Literal = token.NOT_EQ, literal
 		} else {
 			tok = newToken(token.BANG, l.ch, l.filename, l.line, l.position)
 		}
@@ -91,30 +89,28 @@ func (l *Lexer) NextToken() token.Token {
 	case '<':
 		if l.peekRune() == '=' {
 			ch := l.ch
+			
+			tok.Filename, tok.Line, tok.Col = l.filename, l.line, l.position
+			
 			l.readRune()
+			
 			literal := string(ch) + string(l.ch)
-			tok = token.Token{
-				Type: token.LTE, 
-				Literal: literal,
-				Filename: l.filename,
-				Line: l.line,
-				Col: l.position,
-			}
+			
+			tok.Type, tok.Literal = token.LTE, literal
 		} else {
 			tok = newToken(token.LT, l.ch, l.filename, l.line, l.position)
 		}
 	case '>':
 		if l.peekRune() == '=' {
 			ch := l.ch
+			
+			tok.Filename, tok.Line, tok.Col = l.filename, l.line, l.position
+			
 			l.readRune()
+			
 			literal := string(ch) + string(l.ch)
-			tok = token.Token{
-				Type: token.GTE, 
-				Literal: literal,
-				Filename: l.filename,
-				Line: l.line,
-				Col: l.position,
-			}
+
+			tok.Type, tok.Literal = token.GTE, literal
 		} else {
 			tok = newToken(token.GT, l.ch, l.filename, l.line, l.position)
 		}
@@ -134,13 +130,13 @@ func (l *Lexer) NextToken() token.Token {
 		tok.Literal = ""
 		tok.Type = token.EOF
 	default:
-		if isLetter(l.ch) {
-			tok.Col = l.position
+		if isLetterOrSymbol(l.ch) {
+			tok.Filename, tok.Line, tok.Col = l.filename, l.line, l.position
+
 			tok.Literal = l.readIdentifier()
+
 			tok.Type = token.LookupIdent(tok.Literal)
 
-			tok.Filename, tok.Line = l.filename, l.line
-			
 			return tok
 		} else if isDigit(l.ch) {
 			tok.Filename, tok.Line, tok.Col = l.filename, l.line, l.position
@@ -158,8 +154,8 @@ func (l *Lexer) NextToken() token.Token {
 	return tok
 }
 
-func isLetter(ch rune) bool {
-	return unicode.IsLetter(ch) || ch == '_'
+func isLetterOrSymbol(ch rune) bool {
+	return unicode.IsLetter(ch) || ch == '_' || unicode.IsSymbol(ch)
 }
 
 func isDigit(ch rune) bool {
@@ -197,7 +193,7 @@ func (l *Lexer) peekRune() rune {
 func (l *Lexer) readIdentifier() string {
 	var identifier string
 
-	for isLetter(l.ch) {
+	for isLetterOrSymbol(l.ch) {
 		identifier += string(l.ch)
 		l.readRune()
 	}
