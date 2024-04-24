@@ -3,7 +3,6 @@ package token
 type TokenType string
 
 const (
-	ERROR   = "ERROR"
 	ILLEGAL = "ILLEGAL"
 	EOF     = "EOF"
 
