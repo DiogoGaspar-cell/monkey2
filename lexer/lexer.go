@@ -1,7 +1,6 @@
 package lexer
 
 import (
-	"log"
 	"strings"
 	"unicode"
 
@@ -31,19 +30,6 @@ func New(filename string, input string) *Lexer{
 	return l
 }
 
-func (l *Lexer) readRune() {
-	r, _, err := l.reader.ReadRune()
-
-	if err != nil {
-		log.Printf("Error: %v", err)
-		l.ch = -1
-		return
-	}
-
-	l.ch = r
-	l.position += 1
-}
-
 func (l *Lexer) NextToken() token.Token {
 	var tok token.Token
 
@@ -51,69 +37,21 @@ func (l *Lexer) NextToken() token.Token {
 
 	switch l.ch {
 	case '=':
-		if l.peekRune() == '=' {
-			ch := l.ch
-			
-			tok.Filename, tok.Line, tok.Col = l.filename, l.line, l.position
-			
-			l.readRune()
-			
-			literal := string(ch) + string(l.ch)
-			
-			tok.Type, tok.Literal = token.EQ, literal
-		} else {
-			tok = newToken(token.ASSIGN, l.ch, l.filename, l.line, l.position)
-		}
+		tok = l.oneOrTwoCharToken('=', token.ASSIGN, token.EQ)
 	case '+':
 		tok = newToken(token.PLUS, l.ch, l.filename, l.line, l.position)
 	case '-':
 		tok = newToken(token.MINUS, l.ch, l.filename, l.line, l.position)
 	case '!':
-		if l.peekRune() == '=' {
-			ch := l.ch
-			
-			tok.Filename, tok.Line, tok.Col = l.filename, l.line, l.position
-			
-			l.readRune()
-			
-			literal := string(ch) + string(l.ch)
-			
-			tok.Type, tok.Literal = token.NOT_EQ, literal
-		} else {
-			tok = newToken(token.BANG, l.ch, l.filename, l.line, l.position)
-		}
+		tok = l.oneOrTwoCharToken('=', token.BANG, token.NOT_EQ)
 	case '/':
 		tok = newToken(token.SLASH, l.ch, l.filename, l.line, l.position)
 	case '*':
 		tok = newToken(token.ASTERISK, l.ch, l.filename, l.line, l.position)
 	case '<':
-		if l.peekRune() == '=' {
-			ch := l.ch
-			
-			tok.Filename, tok.Line, tok.Col = l.filename, l.line, l.position
-			
-			l.readRune()
-			
-			literal := string(ch) + string(l.ch)
-			
-			tok.Type, tok.Literal = token.LTE, literal
-		} else {
-			tok = newToken(token.LT, l.ch, l.filename, l.line, l.position)
-		}
+		tok = l.oneOrTwoCharToken('=', token.LT, token.LTE)
 	case '>':
-		if l.peekRune() == '=' {
-			ch := l.ch
-			
-			tok.Filename, tok.Line, tok.Col = l.filename, l.line, l.position
-			
-			l.readRune()
-			
-			literal := string(ch) + string(l.ch)
-
-			tok.Type, tok.Literal = token.GTE, literal
-		} else {
-			tok = newToken(token.GT, l.ch, l.filename, l.line, l.position)
-		}
+		tok = l.oneOrTwoCharToken('=', token.GT, token.GTE)
 	case ';':
 		tok = newToken(token.TERMINATOR, l.ch, l.filename, l.line, l.position)
 	case ',':
@@ -127,11 +65,7 @@ func (l *Lexer) NextToken() token.Token {
 	case ')':
 		tok = newToken(token.RPAREN, l.ch, l.filename, l.line, l.position)
 	case 0:
-		tok.Literal = ""
-		tok.Type = token.EOF
-	case -1:
-		tok.Literal = ""
-		tok.Type = token.ERROR
+		tok.Type, tok.Literal, tok.Filename, tok.Line, tok.Col = token.EOF, "", l.filename, l.line, l.position
 	default:
 		if isLetterOrSymbol(l.ch) {
 			tok.Filename, tok.Line, tok.Col = l.filename, l.line, l.position
@@ -157,6 +91,39 @@ func (l *Lexer) NextToken() token.Token {
 	return tok
 }
 
+func (l *Lexer) readRune() {
+	r, _, err := l.reader.ReadRune()
+
+	if err != nil {
+		l.position += 1
+		l.ch = 0
+		return
+	}
+
+	l.ch = r
+	l.position += 1
+}
+
+func (l *Lexer) oneOrTwoCharToken(expected rune, oneCharTokenType token.TokenType, twoCharTokenType token.TokenType) token.Token {
+	var tok token.Token
+
+	if l.peekRune() == expected {
+		ch := l.ch
+		
+		tok.Filename, tok.Line, tok.Col = l.filename, l.line, l.position
+		
+		l.readRune()
+		
+		literal := string(ch) + string(l.ch)
+
+		tok.Type, tok.Literal = twoCharTokenType, literal
+	} else {
+		tok = newToken(oneCharTokenType, l.ch, l.filename, l.line, l.position)
+	}
+
+	return tok;
+}
+
 func isLetterOrSymbol(ch rune) bool {
 	return unicode.IsLetter(ch) || ch == '_' || unicode.IsSymbol(ch)
 }
@@ -179,15 +146,13 @@ func (l *Lexer) peekRune() rune {
 	r, _, err := l.reader.ReadRune()
 
 	if err != nil {
-		log.Printf("Error: %v", err)
-		return -1
+		return 0
 	}
 	
 	err = l.reader.UnreadRune()
 
 	if err != nil {
-		log.Printf("Error: %v", err)
-		return -1
+		return 0
 	}
 
 	return r
