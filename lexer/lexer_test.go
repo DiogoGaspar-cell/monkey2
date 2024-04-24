@@ -21,6 +21,18 @@ let lessThanOrEqualTo = fn(x, y) {
 let result = add(five, ten);
 
 let 🤖 = 3.14;
+
+!-/*5;
+5 < 10 > 5;
+
+if (5 < 10) {
+	return true;
+} else {
+	return false;
+}
+
+10 == 10;
+10 != 9;
 `
 
 	expectedFilename := "test.go"
@@ -94,6 +106,54 @@ let 🤖 = 3.14;
 		{token.ASSIGN, "=", expectedFilename, 14, 6},
 		{token.FLOAT, "3.14", expectedFilename, 14, 8},
 		{token.TERMINATOR, ";", expectedFilename, 14, 12},
+
+		{token.BANG, "!", expectedFilename, 16, 0},
+		{token.MINUS, "-", expectedFilename, 16, 1},
+		{token.SLASH, "/", expectedFilename, 16, 2},
+		{token.ASTERISK, "*", expectedFilename, 16, 3},
+		{token.INT, "5", expectedFilename, 16, 4},
+		{token.TERMINATOR, ";", expectedFilename, 16, 5},
+
+		{token.INT, "5", expectedFilename, 17, 0},
+		{token.LT, "<", expectedFilename, 17, 2},
+		{token.INT, "10", expectedFilename, 17, 4},
+		{token.GT, ">", expectedFilename, 17, 7},
+		{token.INT, "5", expectedFilename, 17, 9},
+		{token.TERMINATOR, ";", expectedFilename, 17, 10},
+
+		{token.IF, "if", expectedFilename, 19, 0},
+		{token.LPAREN, "(", expectedFilename, 19, 3},
+		{token.INT, "5", expectedFilename, 19, 4},
+		{token.LT, "<", expectedFilename, 19, 6},
+		{token.INT, "10", expectedFilename, 19, 8},
+		{token.RPAREN, ")", expectedFilename, 19, 10},
+		{token.LBRACE, "{", expectedFilename, 19, 12},
+
+		{token.RETURN, "return", expectedFilename, 20, 1},
+		{token.TRUE, "true", expectedFilename, 20, 8},
+		{token.TERMINATOR, ";", expectedFilename, 20, 12},
+
+		{token.RBRACE, "}", expectedFilename, 21, 0},
+		{token.ELSE, "else", expectedFilename, 21, 2},
+		{token.LBRACE, "{", expectedFilename, 21, 7},
+		
+		{token.RETURN, "return", expectedFilename, 22, 1},
+		{token.FALSE, "false", expectedFilename, 22, 8},
+		{token.TERMINATOR, ";", expectedFilename, 22, 13},
+		
+		{token.RBRACE, "}", expectedFilename, 23, 0},
+
+		{token.INT, "10", expectedFilename, 25, 0},
+		{token.EQ, "==", expectedFilename, 25, 3},
+		{token.INT, "10", expectedFilename, 25, 6},
+		{token.TERMINATOR, ";", expectedFilename, 25, 8},
+
+		{token.INT, "10", expectedFilename, 26, 0},
+		{token.NOT_EQ, "!=", expectedFilename, 26, 3},
+		{token.INT, "9", expectedFilename, 26, 6},
+		{token.TERMINATOR, ";", expectedFilename, 26, 7},
+
+		{token.EOF, "", expectedFilename, 27, 0},
 	}
 
 	l := New("test.go", input)
