@@ -22,7 +22,7 @@ func New(filename string, input string) *Lexer{
 		filename: filename,
 		reader: r,
 		line: 1,
-		position: -1,
+		position: 0,
 	}
 	
 	l.readRune()
@@ -136,7 +136,7 @@ func (l *Lexer) skipWhitespace() {
 	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
 		if (l.ch == '\n') {
 			l.line++
-			l.position = -1
+			l.position = 0
 		}
 		l.readRune()
 	}
